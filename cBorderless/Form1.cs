@@ -12,9 +12,39 @@ namespace cBorderless
 {
     public partial class Form1 : Form
     {
-        public Form1()
+        /// <summary>
+        /// Constructor
+        /// If given no args, runs via gui
+        /// If there is 1 arg, attempts to find a process with that string and make it windowed borderless
+        /// If there is more than 1 arg, closes
+        /// </summary>
+        /// <param name="args">Appliaction arguments</param>
+        public Form1(string[] args)
         {
-            InitializeComponent();
+            if (args.Length == 0)
+            {
+                InitializeComponent();
+            }
+            else if (args.Length == 1)
+            {
+                System.Diagnostics.Process[] SelectedProcess = System.Diagnostics.Process.GetProcessesByName(args[0]);
+
+                if (SelectedProcess.Length >= 1)
+                {
+                    this.makeProcessBorderless(SelectedProcess[0]);
+                    Environment.Exit(0);
+                }
+                else
+                {
+                    MessageBox.Show("Could not find valid process for given arg: " + args[0]);
+                    Environment.Exit(0);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Only possible arguments are a process name or nothing at all. Exiting...");
+                Environment.Exit(0);
+            }
         }
 
         #region Win32 Definitions
@@ -56,23 +86,29 @@ namespace cBorderless
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void button_make_borederless_Click(object sender, EventArgs e)
+        private void button_make_borderless_Click(object sender, EventArgs e)
         {
             System.Diagnostics.Process[] SelectedProcess = System.Diagnostics.Process.GetProcessesByName(combobox_processes.SelectedItem.ToString());
-
-            if (SelectedProcess.Length > 0)
-            {
-                IntPtr hwnd = SelectedProcess[0].MainWindowHandle;
-                long style = GetWindowLong(hwnd, GWL_STYLE);
-                style &= ~(WS_CAPTION | WS_THICKFRAME | WS_MINIMIZE | WS_MAXIMIZE | WS_SYSMENU);
-                SetWindowLong(hwnd, GWL_STYLE, (int)style);
-
-                long lExStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
-                lExStyle &= ~(WS_EX_DLGMODALFRAME | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE);
-                SetWindowLong(hwnd, GWL_EXSTYLE, (int)lExStyle);
-                SetWindowPos(SelectedProcess[0].MainWindowHandle, IntPtr.Zero, -0, -0, Screen.GetBounds(this).Width, Screen.GetBounds(this).Height, (SWP_FRAMECHANGED | SWP_NOZORDER | SWP_NOREPOSITION));
-            }
+            makeProcessBorderless(SelectedProcess[0]);
         }
+
+        /// <summary>
+        /// Calls needed Windows APIs to make the given process windowed borderless
+        /// </summary>
+        /// <param name="SelectedProcess">A given System.Diagnostics.Process</param>
+        private void makeProcessBorderless(System.Diagnostics.Process SelectedProcess)
+        {
+            IntPtr hwnd = SelectedProcess.MainWindowHandle;
+            long style = GetWindowLong(hwnd, GWL_STYLE);
+            style &= ~(WS_CAPTION | WS_THICKFRAME | WS_MINIMIZE | WS_MAXIMIZE | WS_SYSMENU);
+            var a = SetWindowLong(hwnd, GWL_STYLE, (int)style);
+            var d = Marshal.GetLastWin32Error();
+            long lExStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
+            lExStyle &= ~(WS_EX_DLGMODALFRAME | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE);
+            a = SetWindowLong(hwnd, GWL_EXSTYLE, (int)lExStyle);
+            var b = SetWindowPos(SelectedProcess.MainWindowHandle, IntPtr.Zero, -0, -0, Screen.GetBounds(this).Width, Screen.GetBounds(this).Height, (SWP_FRAMECHANGED | SWP_NOZORDER | SWP_NOREPOSITION));
+        }
+
 
         /// <summary>
         /// called when the refresh button is clicked

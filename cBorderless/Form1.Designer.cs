@@ -48,7 +48,7 @@
             this.button_make_borderless.Text = "Make Selected Process Windowed Borderless";
             this.toolTip1.SetToolTip(this.button_make_borderless, "Make the selected process windowed borderless");
             this.button_make_borderless.UseVisualStyleBackColor = true;
-            this.button_make_borderless.Click += new System.EventHandler(this.button_make_borederless_Click);
+            this.button_make_borderless.Click += new System.EventHandler(this.button_make_borderless_Click);
             // 
             // label_process
             // 
