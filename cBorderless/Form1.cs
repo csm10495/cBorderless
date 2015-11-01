@@ -82,14 +82,23 @@ namespace cBorderless
         #endregion
 
         /// <summary>
-        /// makes the process selected in the combobox fullscreen windowed borderless
+        /// makes the process selected in the combobox (or really whatever is the current text in the combobox) fullscreen windowed borderless
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void button_make_borderless_Click(object sender, EventArgs e)
         {
-            System.Diagnostics.Process[] SelectedProcess = System.Diagnostics.Process.GetProcessesByName(combobox_processes.SelectedItem.ToString());
-            makeProcessBorderless(SelectedProcess[0]);
+            try
+            {
+                System.Diagnostics.Process[] SelectedProcess = System.Diagnostics.Process.GetProcessesByName(combobox_processes.Text);
+                makeProcessBorderless(SelectedProcess[0]);
+            }
+            catch(Exception)
+            {
+                MessageBox.Show("Unable to find process with given name: \"" + combobox_processes.Text + "\". Refreshing processes list.", "cBorderless: Exception Caught!");
+                refreshProcesses();
+            }
+
         }
 
         /// <summary>
