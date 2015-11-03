@@ -15,7 +15,7 @@ namespace cBorderless
         /// <summary>
         /// Constructor
         /// If given no args, runs via gui
-        /// If there is 1 arg, attempts to find a process with that string and make it windowed borderless
+        /// If there is 1 or more args, attempts to find a process with each arg string and make it windowed borderless
         /// If there is more than 1 arg, closes
         /// </summary>
         /// <param name="args">Appliaction arguments</param>
@@ -25,24 +25,25 @@ namespace cBorderless
             {
                 InitializeComponent();
             }
-            else if (args.Length == 1)
+            else if (args.Length >= 1)
             {
-                System.Diagnostics.Process[] SelectedProcess = System.Diagnostics.Process.GetProcessesByName(args[0]);
+                bool foundProcess = false;
 
-                if (SelectedProcess.Length >= 1)
+                foreach (string processString in args)
                 {
-                    this.makeProcessBorderless(SelectedProcess[0]);
-                    Environment.Exit(0);
+                    System.Diagnostics.Process[] SelectedProcess = System.Diagnostics.Process.GetProcessesByName(processString);
+
+                    if (SelectedProcess.Length >= 1)
+                    {
+                        this.makeProcessBorderless(SelectedProcess[0]);
+                        foundProcess = true;
+                    }
                 }
-                else
+                
+                if (!foundProcess)
                 {
-                    MessageBox.Show("Could not find valid process for given arg: " + args[0]);
-                    Environment.Exit(0);
+                    MessageBox.Show("No processes were found with the given args. Exitting.", "cBorderless");
                 }
-            }
-            else
-            {
-                MessageBox.Show("Only possible arguments are a process name or nothing at all. Exiting...");
                 Environment.Exit(0);
             }
         }
