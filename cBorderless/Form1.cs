@@ -17,10 +17,12 @@ namespace cBorderless
         /// If given no args, runs via gui
         /// If there is 1 or more args, attempts to find a process with each arg string and make it windowed borderless
         /// If there is more than 1 arg, closes
+        /// If an arg follows the form MAX_WAIT=<seconds> then have the process be continually modified for that given time frame. Will also wait that long for the process.
         /// </summary>
         /// <param name="args">Appliaction arguments</param>
         public Form1(string[] args)
         {
+            const string timedWaitKeyword = "MAX_WAIT";
             if (args.Length == 0)
             {
                 InitializeComponent();
@@ -28,21 +30,35 @@ namespace cBorderless
             else if (args.Length >= 1)
             {
                 bool foundProcess = false;
-
-                foreach (string processString in args)
+                int endTime = -1;
+                int waitTime = 0;
+                int startTime = getTimeInSeconds();
+                do
                 {
-                    System.Diagnostics.Process[] SelectedProcess = System.Diagnostics.Process.GetProcessesByName(processString);
-
-                    if (SelectedProcess.Length >= 1)
+                    foreach (string processString in args)
                     {
-                        this.makeProcessBorderless(SelectedProcess[0]);
-                        foundProcess = true;
+                        // Look for MAX_WAIT to know how long to try this loop for. Only do this once (unless MAX_WAIT is -1).
+                        if (processString.StartsWith(timedWaitKeyword) && processString.Contains("=") && endTime == -1)
+                        {
+                            // MAX_WAIT=10 
+                            // Makes us take at most 10 seconds of waiting.
+                            waitTime = Convert.ToInt16(processString.Split('=')[1]);
+                            endTime = startTime + waitTime;
+                        }
+
+                        System.Diagnostics.Process[] SelectedProcess = System.Diagnostics.Process.GetProcessesByName(processString);
+
+                        if (SelectedProcess.Length >= 1)
+                        {
+                            this.makeProcessBorderless(SelectedProcess[0]);
+                            foundProcess = true;
+                        }
                     }
-                }
-                
+                } while (getTimeInSeconds() < endTime);
+
                 if (!foundProcess)
                 {
-                    MessageBox.Show("No processes were found with the given args. Exitting.", "cBorderless");
+                    MessageBox.Show(String.Format("No processes were found with the given args. {0} was set to {1} Exiting.", timedWaitKeyword, waitTime), "cBorderless");
                 }
                 Environment.Exit(0);
             }
@@ -83,6 +99,15 @@ namespace cBorderless
         #endregion
 
         /// <summary>
+        /// Gets the epoch time in seconds
+        /// </summary>
+        /// <returns></returns>
+        private int getTimeInSeconds()
+        {
+            return (int)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds;
+        }
+
+        /// <summary>
         /// makes the process selected in the combobox (or really whatever is the current text in the combobox) fullscreen windowed borderless
         /// </summary>
         /// <param name="sender"></param>
@@ -112,13 +137,11 @@ namespace cBorderless
             long style = GetWindowLong(hwnd, GWL_STYLE);
             style &= ~(WS_CAPTION | WS_THICKFRAME | WS_MINIMIZE | WS_MAXIMIZE | WS_SYSMENU);
             var a = SetWindowLong(hwnd, GWL_STYLE, (int)style);
-            var d = Marshal.GetLastWin32Error();
             long lExStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
             lExStyle &= ~(WS_EX_DLGMODALFRAME | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE);
             a = SetWindowLong(hwnd, GWL_EXSTYLE, (int)lExStyle);
             var b = SetWindowPos(SelectedProcess.MainWindowHandle, IntPtr.Zero, -0, -0, Screen.GetBounds(this).Width, Screen.GetBounds(this).Height, (SWP_FRAMECHANGED | SWP_NOZORDER | SWP_NOREPOSITION));
         }
-
 
         /// <summary>
         /// called when the refresh button is clicked
