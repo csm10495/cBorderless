@@ -18,10 +18,12 @@ namespace cBorderless
         /// If there is 1 or more args, attempts to find a process with each arg string and make it windowed borderless
         /// If there is more than 1 arg, closes
         /// If an arg follows the form MAX_WAIT=<seconds> then have the process be continually modified for that given time frame. Will also wait that long for the process.
+        /// -v will make it send a notify icon approx every second during scanning
         /// </summary>
         /// <param name="args">Appliaction arguments</param>
         public Form1(string[] args)
         {
+            NotifyIcon notifyIcon = new NotifyIcon();
             const string timedWaitKeyword = "MAX_WAIT";
             if (args.Length == 0)
             {
@@ -30,11 +32,15 @@ namespace cBorderless
             else if (args.Length >= 1)
             {
                 bool foundProcess = false;
+                bool verbose = false; // -v flag... will notify every second during scan
                 int endTime = -1;
                 int waitTime = 0;
                 int startTime = getTimeInSeconds();
+                int lastSecondDisplayed = -1;
                 do
                 {
+                    int time = getTimeInSeconds();
+
                     foreach (string processString in args)
                     {
                         // Look for MAX_WAIT to know how long to try this loop for. Only do this once (unless MAX_WAIT is -1).
@@ -46,6 +52,12 @@ namespace cBorderless
                             endTime = startTime + waitTime;
                         }
 
+                        // Look for verbose flag
+                        if (!verbose && processString == "-v")
+                        {
+                            verbose = true;
+                        }
+
                         System.Diagnostics.Process[] SelectedProcess = System.Diagnostics.Process.GetProcessesByName(processString);
 
                         if (SelectedProcess.Length >= 1)
@@ -54,7 +66,16 @@ namespace cBorderless
                             foundProcess = true;
                         }
                     }
+
+                    // Update every second
+                    if (verbose && time != lastSecondDisplayed)
+                    {
+                        displayBubble(notifyIcon, String.Format("Time left for cBorderless operation: {0} seconds.", (endTime - time)), 500);
+                        lastSecondDisplayed = time;
+                    }
                 } while (getTimeInSeconds() < endTime);
+
+                notifyIcon.Visible = false;
 
                 if (!foundProcess)
                 {
@@ -108,6 +129,20 @@ namespace cBorderless
         }
 
         /// <summary>
+        /// Displays a bubble notification
+        /// </summary>
+        /// <param name="notifyIcon">The NotifyIcon to use</param>
+        /// <param name="text">Text to display</param>
+        /// <param name="milliseconds">Number of ms to display for</param>
+        private void displayBubble(NotifyIcon notifyIcon, string text, int milliseconds)
+        {
+            notifyIcon.Visible = false;
+            notifyIcon.Icon = System.Drawing.SystemIcons.Exclamation;
+            notifyIcon.Visible = true;
+            notifyIcon.ShowBalloonTip(milliseconds, "cBorderless", text, ToolTipIcon.Info);
+        }
+
+        /// <summary>
         /// makes the process selected in the combobox (or really whatever is the current text in the combobox) fullscreen windowed borderless
         /// </summary>
         /// <param name="sender"></param>
@@ -136,11 +171,11 @@ namespace cBorderless
             IntPtr hwnd = SelectedProcess.MainWindowHandle;
             long style = GetWindowLong(hwnd, GWL_STYLE);
             style &= ~(WS_CAPTION | WS_THICKFRAME | WS_MINIMIZE | WS_MAXIMIZE | WS_SYSMENU);
-            var a = SetWindowLong(hwnd, GWL_STYLE, (int)style);
+            SetWindowLong(hwnd, GWL_STYLE, (int)style);
             long lExStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
             lExStyle &= ~(WS_EX_DLGMODALFRAME | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE);
-            a = SetWindowLong(hwnd, GWL_EXSTYLE, (int)lExStyle);
-            var b = SetWindowPos(SelectedProcess.MainWindowHandle, IntPtr.Zero, -0, -0, Screen.GetBounds(this).Width, Screen.GetBounds(this).Height, (SWP_FRAMECHANGED | SWP_NOZORDER | SWP_NOREPOSITION));
+            SetWindowLong(hwnd, GWL_EXSTYLE, (int)lExStyle);
+            SetWindowPos(SelectedProcess.MainWindowHandle, IntPtr.Zero, -0, -0, Screen.GetBounds(this).Width, Screen.GetBounds(this).Height, (SWP_FRAMECHANGED | SWP_NOZORDER | SWP_NOREPOSITION));
         }
 
         /// <summary>
