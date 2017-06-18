@@ -6,3 +6,5 @@
 /cBorderless/obj/Debug
 /cBorderless/cBorderless.csproj.user
 /.vs/cBorderless/v15/.suo
+/cBorderless/bin/Release
+/cBorderless/obj/Release
