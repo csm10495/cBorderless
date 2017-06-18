@@ -79,7 +79,7 @@ namespace cBorderless
 
                 if (!foundProcess)
                 {
-                    MessageBox.Show(String.Format("No processes were found with the given args. {0} was set to {1} Exiting.", timedWaitKeyword, waitTime), "cBorderless");
+                    MessageBox.Show(String.Format("No processes were found with the given args. {0} was set to {1}. Exiting.", timedWaitKeyword, waitTime), "cBorderless");
                 }
                 Environment.Exit(0);
             }
@@ -218,6 +218,11 @@ namespace cBorderless
             combobox_processes.Items.Remove("");
 
             combobox_processes.SelectedIndex = 0;
+        }
+
+        private void revision_info_button_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show(RevisionInfo.RevisionString, "cBorderless Info");
         }
     }
 }

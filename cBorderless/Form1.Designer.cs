@@ -35,6 +35,7 @@
             this.combobox_processes = new System.Windows.Forms.ComboBox();
             this.button_refresh = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.revision_info_button = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // button_make_borderless
@@ -43,7 +44,7 @@
             this.button_make_borderless.Font = new System.Drawing.Font("Arial", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.button_make_borderless.Location = new System.Drawing.Point(76, 39);
             this.button_make_borderless.Name = "button_make_borderless";
-            this.button_make_borderless.Size = new System.Drawing.Size(212, 63);
+            this.button_make_borderless.Size = new System.Drawing.Size(244, 63);
             this.button_make_borderless.TabIndex = 0;
             this.button_make_borderless.Text = "Make Selected Process Windowed Borderless";
             this.toolTip1.SetToolTip(this.button_make_borderless, "Make the selected process windowed borderless");
@@ -83,11 +84,23 @@
             this.button_refresh.UseVisualStyleBackColor = true;
             this.button_refresh.Click += new System.EventHandler(this.button_refresh_Click);
             // 
+            // revision_info_button
+            // 
+            this.revision_info_button.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.revision_info_button.Location = new System.Drawing.Point(294, 9);
+            this.revision_info_button.Name = "revision_info_button";
+            this.revision_info_button.Size = new System.Drawing.Size(26, 24);
+            this.revision_info_button.TabIndex = 4;
+            this.revision_info_button.Text = "?";
+            this.revision_info_button.UseVisualStyleBackColor = true;
+            this.revision_info_button.Click += new System.EventHandler(this.revision_info_button_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(300, 109);
+            this.ClientSize = new System.Drawing.Size(327, 108);
+            this.Controls.Add(this.revision_info_button);
             this.Controls.Add(this.button_refresh);
             this.Controls.Add(this.combobox_processes);
             this.Controls.Add(this.label_process);
@@ -110,6 +123,7 @@
         private System.Windows.Forms.ComboBox combobox_processes;
         private System.Windows.Forms.Button button_refresh;
         private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.Button revision_info_button;
     }
 }
 
