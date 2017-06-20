@@ -1,0 +1,3 @@
+[submodule "cBorderless/cGitInfo"]
+	path = cBorderless/cGitInfo
+	url = https://github.com/csm10495/cGitInfo
