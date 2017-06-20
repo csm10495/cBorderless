@@ -123,10 +123,21 @@ if ERRORLEVEL 1 (
     ECHO No Python... skipping special build step
 ) ELSE (
     ECHO Found Python... getting git revision info.
-   cd $(ProjectDir)/cGitInfo
-   python c_git_info.py -i ../RevisionInfoTemplate.txt -o ../RevisionInfo.cs -r  $(SolutionDir)
+    cd $(ProjectDir)cGitInfo
+    IF EXIST "c_git_info.py" (
+        python c_git_info.py -i ../RevisionInfoTemplate.txt -o ../RevisionInfo.cs -r  $(SolutionDir)
+    ) ELSE (
+        ECHO Please clone/pull the cGitInfo submodule for Revision Information.
+        GOTO BASIC_REV_INFO
+    )
+    GOTO BASIC_REV_INFO
 )
-</PreBuildEvent>
+
+GOTO END
+:BASIC_REV_INFO
+ECHO Copying file without updated info
+COPY $(ProjectDir)RevisionInfoTemplate.txt  $(ProjectDir)RevisionInfo.cs
+:END</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
