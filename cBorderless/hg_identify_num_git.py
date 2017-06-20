@@ -29,12 +29,7 @@ def getListOfCommits(branch='master'):
     Brief:
         Returns list of commits on given branch. 0th is most recent.
     '''
-    outputLines = subprocess.check_output('git log --full-history --pretty=oneline %s' % branch, shell=True).decode().splitlines()
-    commits = []
-    for i in outputLines:
-        if i.strip() != '':
-            commits.append(i.split(' ')[0])
-    
+    commits = subprocess.check_output('git log --pretty=format:%%h --full-history %s' % branch, shell=True).decode().splitlines()
     return commits
     
 def getCurrentCommitId(branch='master'):
@@ -64,7 +59,14 @@ def getRepoNameFromCurrentFolder():
         Gets the name of the repo from the current folder. Assumes the folder name was not changed
     '''
     return os.path.basename(os.getcwd())
-    
+
+def getOriginUrl(repoPath='.'):
+    '''
+    Brief:
+        Gets the url of the origin.
+    '''
+    return subprocess.check_output('git config --get remote.origin.url', shell=True).decode().splitlines()[0]
+
 def getRepoRevisionSetInfo(repoPath='.'):
     '''
     Brief:
@@ -77,7 +79,8 @@ def getRepoRevisionSetInfo(repoPath='.'):
         hgIdNum = getHgStyleIdNum(branch)
         commitId = getCurrentCommitId(branch)
         repoName = getRepoNameFromCurrentFolder()
-        return "%s %s (hg:%s) - %s" % (repoName, commitId, hgIdNum, branch)
+        origin = getOriginUrl()
+        return "%s - %s (hg:%s) - %s - %s" % (repoName, commitId, hgIdNum, branch, origin)
     finally:
         os.chdir(oldCwd)
         

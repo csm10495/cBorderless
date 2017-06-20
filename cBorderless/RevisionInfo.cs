@@ -9,7 +9,7 @@ namespace cBorderless
 {
     class RevisionInfo
     {
-        public static string RevisionString = "cBorderless Unknown Revision";
+        public static string RevisionString = "cBorderless - 67ede4c+ (hg:13+) - master - https://github.com/csm10495/cBorderless.git";
     }
 }
 
