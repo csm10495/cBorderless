@@ -1,0 +1,15 @@
+﻿
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace cBorderless
+{
+    class RevisionInfo
+    {
+        public static string RevisionString = "<C_GIT_INFO>"; 
+    }
+}
+

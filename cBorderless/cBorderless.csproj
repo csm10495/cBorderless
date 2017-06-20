@@ -102,6 +102,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="icon.ico" />
+    <Content Include="RevisionInfoTemplate.txt" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
@@ -122,10 +123,8 @@ if ERRORLEVEL 1 (
     ECHO No Python... skipping special build step
 ) ELSE (
     ECHO Found Python... getting git revision info.
-   cd $(ProjectDir)
-   python hg_identify_num_git.py &gt; rev.txt
-
-
+   cd $(ProjectDir)/cGitInfo
+   python c_git_info.py -i ../RevisionInfoTemplate.txt -o ../RevisionInfo.cs -r  $(SolutionDir)
 )
 </PreBuildEvent>
   </PropertyGroup>
