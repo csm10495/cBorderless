@@ -126,6 +126,7 @@ if ERRORLEVEL 1 (
     cd $(ProjectDir)cGitInfo
     IF EXIST "c_git_info.py" (
         python c_git_info.py -i ../RevisionInfoTemplate.txt -o ../RevisionInfo.cs -r  $(SolutionDir)
+        goto END
     ) ELSE (
         ECHO Please clone/pull the cGitInfo submodule for Revision Information.
         GOTO BASIC_REV_INFO
